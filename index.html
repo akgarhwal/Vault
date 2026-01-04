@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Manager</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/cards.css">
+    <link rel="stylesheet" href="styles/passwords.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        #warning-banner {
+            background: #ef4444;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="warning-banner">
+        ⚠️ <strong>Setup Required:</strong> Browser security prevents this app from running directly from a file.
+        Please serve it using a local server (e.g., VS Code Live Server, python http.server, or npx serve).
+    </div>
+    <script>
+        if (window.location.protocol === 'file:') {
+            document.getElementById('warning-banner').style.display = 'block';
+        }
+        if (!window.crypto || !window.crypto.subtle) {
+            const banner = document.getElementById('warning-banner');
+            banner.innerHTML += '<br>⚠️ <strong>Security Error:</strong> Web Crypto API is not available in this context (requires HTTPS or localhost).';
+            banner.style.display = 'block';
+        }
+    </script>
+    <div id="app">
+        <!-- Auth View -->
+        <div id="auth-view" class="view active">
+            <div class="auth-container">
+                <h1>Unlock Vault</h1>
+                <p>Enter your master password to access your secure data.</p>
+                <div class="input-group">
+                    <input type="password" id="master-password-input" placeholder="Master Password" />
+                </div>
+                <button id="unlock-btn" class="btn btn-primary">Unlock</button>
+                <p id="auth-error" class="error-text hidden"></p>
+                <div class="auth-footer">
+                    <p class="small-text">First time? Enter a new password to create your vault.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view hidden">
+            <header class="app-header">
+                <div class="logo">🔒 Vault</div>
+                <div class="header-actions">
+                    <button id="export-btn" class="btn btn-secondary btn-sm">Export</button>
+                    <button id="import-btn" class="btn btn-secondary btn-sm">Import</button>
+                    <button id="lock-btn" class="btn btn-danger btn-sm">Lock</button>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <aside class="sidebar">
+                    <nav>
+                        <button class="nav-item active" data-filter="all">All Items</button>
+                        <button class="nav-item" data-filter="password">Passwords</button>
+                        <button class="nav-item" data-filter="card">Cards</button>
+                    </nav>
+                </aside>
+
+                <section class="content-area">
+                    <div class="toolbar">
+                        <input type="text" id="search-input" placeholder="Search vault..." />
+                        <button id="add-item-btn" class="btn btn-primary">+ Add New</button>
+                    </div>
+                    <div id="items-grid" class="items-grid">
+                        <!-- Items will be injected here -->
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div id="item-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title">Add Item</h2>
+                <form id="item-form">
+                    <input type="hidden" id="item-id">
+
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="item-type">
+                            <option value="password">Password</option>
+                            <option value="card">Card</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="item-name" required placeholder="e.g. Netflix, Chase Bank">
+                    </div>
+
+                    <!-- Password Fields -->
+                    <div id="password-fields" class="type-fields">
+                        <div class="form-group">
+                            <label>Username/Email</label>
+                            <input type="text" id="item-username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="item-password">
+                                <button type="button" class="toggle-visibility">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>URL</label>
+                            <input type="url" id="item-url" placeholder="https://example.com">
+                        </div>
+                    </div>
+
+                    <!-- Card Fields -->
+                    <div id="card-fields" class="type-fields hidden">
+                        <div class="form-group">
+                            <label>Cardholder Name</label>
+                            <input type="text" id="card-holder">
+                        </div>
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="card-number">
+                        </div>
+                        <div class="row">
+                            <div class="form-group half">
+                                <label>Expiry (MM/YY)</label>
+                                <input type="text" id="card-expiry">
+                            </div>
+                            <div class="form-group half">
+                                <label>CVV</label>
+                                <input type="text" id="card-cvv">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="cancel-modal" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Import Modal -->
+        <div id="import-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Import Vault</h2>
+                <p class="warning-text">Warning: This will merge with your current data.</p>
+                <div class="form-group">
+                    <label>Paste JSON or Upload File</label>
+                    <textarea id="import-data" rows="5" placeholder="Paste encrypted vault JSON here..."></textarea>
+                    <input type="file" id="import-file" accept=".json" />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-import" class="btn btn-secondary">Cancel</button>
+                    <button type="button" id="confirm-import" class="btn btn-primary">Import</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

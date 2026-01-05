@@ -33,17 +33,6 @@ http://localhost:8080
 1.  Install the **Live Server** extension.
 2.  Right-click `index.html` and select **Open with Live Server**.
 
-## 📦 Deployment (GitHub Pages)
-
-To deploy this to GitHub Pages:
-
-1.  Create a new repository on GitHub.
-2.  Push this code to the repository.
-3.  Go to **Settings** -> **Pages**.
-4.  Set the Source to the `main` branch (and root folder `/`).
-5.  Click **Save**. Your site will be live at `https://<username>.github.io/<repo-name>/`.
-
-**Note**: Since we use relative paths (`./js/app.js`), no build configuration is needed.
 
 ## ⚠️ Security Notice
 

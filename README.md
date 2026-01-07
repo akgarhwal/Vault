@@ -2,6 +2,8 @@
 
 A simple, secure, and modern Password Manager built with **Vanilla JavaScript, HTML, and CSS**. No frameworks, no trackers, just pure web technologies.
 
+[![Vault](https://img.shields.io/badge/Access%20Vault-purple?style=for-the-badge&logo=lock)](https://akgarhwal.github.io/vault/)
+
 ## 🔒 Features
 
 -   **Client-Side Encryption**: Uses **Web Crypto API** (AES-GCM & PBKDF2) to encrypt your data before it is saved. Your master password never leaves your browser.

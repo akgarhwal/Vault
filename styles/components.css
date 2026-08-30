@@ -96,6 +96,65 @@ textarea:focus {
     margin-bottom: 1.5rem;
 }
 
+.password-strength {
+    text-align: left;
+    margin: -0.5rem 0 1.25rem;
+}
+
+.password-strength-track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.password-strength-bar {
+    display: block;
+    height: 100%;
+    width: 15%;
+    background: var(--danger);
+    transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.password-strength[data-score="0"] .password-strength-bar {
+    width: 15%;
+    background: var(--danger);
+}
+
+.password-strength[data-score="1"] .password-strength-bar {
+    width: 30%;
+    background: var(--danger);
+}
+
+.password-strength[data-score="2"] .password-strength-bar {
+    width: 55%;
+    background: #f59e0b;
+}
+
+.password-strength[data-score="3"] .password-strength-bar {
+    width: 75%;
+    background: #10b981;
+}
+
+.password-strength[data-score="4"] .password-strength-bar {
+    width: 100%;
+    background: #10b981;
+}
+
+.btn-text-danger {
+    color: var(--danger);
+    margin-top: 1rem;
+}
+
+#sync-btn.synced {
+    color: #10b981;
+}
+
+#sync-btn.warn {
+    color: #f59e0b;
+}
+
 .auth-footer {
     margin-top: 2rem;
     padding-top: 1rem;

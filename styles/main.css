@@ -17,7 +17,7 @@
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
 
-    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 * {
@@ -43,6 +43,23 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+#warning-banner {
+    display: none;
+    background: #ef4444;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+#warning-banner.is-visible {
+    display: block;
+}
+
+#warning-banner p {
+    color: white;
+    margin-top: 0.5rem;
 }
 
 /* Layout Classes */
@@ -100,6 +117,7 @@ p {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
     font-family: 'Fira Code', 'Consolas', monospace;
     font-size: 0.75rem;
     padding: 0.25rem 0.75rem;

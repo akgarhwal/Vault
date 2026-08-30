@@ -4,21 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests">
     <title>🔒 Vault</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
     <link rel="stylesheet" href="styles/cards.css">
     <link rel="stylesheet" href="styles/passwords.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        #warning-banner {
-            background: #ef4444;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            display: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -26,16 +19,6 @@
         ⚠️ <strong>Setup Required:</strong> Browser security prevents this app from running directly from a file.
         Please serve it using a local server (e.g., VS Code Live Server, python http.server, or npx serve).
     </div>
-    <script>
-        if (window.location.protocol === 'file:') {
-            document.getElementById('warning-banner').style.display = 'block';
-        }
-        if (!window.crypto || !window.crypto.subtle) {
-            const banner = document.getElementById('warning-banner');
-            banner.innerHTML += '<br>⚠️ <strong>Security Error:</strong> Web Crypto API is not available in this context (requires HTTPS or localhost).';
-            banner.style.display = 'block';
-        }
-    </script>
     <div id="app">
         <!-- Auth View -->
         <div id="auth-view" class="view active">
@@ -43,14 +26,25 @@
                 <h1>Unlock Vault</h1>
                 <p>Enter your master password to access your secure data.</p>
                 <div class="input-group">
-                    <input type="password" id="master-password-input" placeholder="Master Password" />
+                    <input type="password" id="master-password-input" placeholder="Master Password"
+                        autocomplete="current-password" spellcheck="false" autocapitalize="off" />
+                </div>
+                <div id="confirm-password-group" class="input-group hidden">
+                    <input type="password" id="master-password-confirm" placeholder="Confirm Master Password"
+                        autocomplete="new-password" spellcheck="false" autocapitalize="off" />
+                </div>
+                <div id="password-strength" class="password-strength hidden" data-score="0">
+                    <div class="password-strength-track">
+                        <span class="password-strength-bar"></span>
+                    </div>
+                    <p id="password-strength-label" class="small-text">Use at least 12 characters.</p>
                 </div>
                 <button id="unlock-btn" class="btn btn-primary">Unlock</button>
                 <p id="auth-error" class="error-text hidden"></p>
                 <div class="auth-footer">
                     <p class="small-text">First time? Enter a new password to create your vault.</p>
-                    <button id="reset-vault-btn" class="btn btn-text btn-sm hidden"
-                        style="color: var(--danger); margin-top: 1rem;">Reset / Delete All Data</button>
+                    <button id="reset-vault-btn" class="btn btn-text btn-sm btn-text-danger hidden">Reset / Delete All
+                        Data</button>
                 </div>
             </div>
         </div>
@@ -79,7 +73,7 @@
 
                 <section class="content-area">
                     <div class="toolbar">
-                        <input type="text" id="search-input" placeholder="Search vault..." />
+                        <input type="text" id="search-input" placeholder="Search vault..." autocomplete="off" />
                         <button id="add-item-btn" class="btn btn-primary">+ Add New</button>
                     </div>
                     <div id="items-grid" class="items-grid">
@@ -93,7 +87,7 @@
         <div id="item-modal" class="modal hidden">
             <div class="modal-content">
                 <h2 id="modal-title">Add Item</h2>
-                <form id="item-form">
+                <form id="item-form" autocomplete="off">
                     <input type="hidden" id="item-id">
 
                     <div class="form-group">
@@ -113,12 +107,12 @@
                     <div id="password-fields" class="type-fields">
                         <div class="form-group">
                             <label>Username/Email</label>
-                            <input type="text" id="item-username">
+                            <input type="text" id="item-username" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label>Password</label>
                             <div class="password-input-wrapper">
-                                <input type="password" id="item-password">
+                                <input type="password" id="item-password" autocomplete="new-password">
                                 <button type="button" id="generate-password-btn" title="Generate Password">🎲</button>
                                 <button type="button" class="toggle-visibility">👁️</button>
                             </div>
@@ -133,20 +127,20 @@
                     <div id="card-fields" class="type-fields hidden">
                         <div class="form-group">
                             <label>Cardholder Name</label>
-                            <input type="text" id="card-holder">
+                            <input type="text" id="card-holder" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label>Card Number</label>
-                            <input type="text" id="card-number">
+                            <input type="text" id="card-number" inputmode="numeric" autocomplete="off">
                         </div>
                         <div class="row">
                             <div class="form-group half">
                                 <label>Expiry (MM/YY)</label>
-                                <input type="text" id="card-expiry">
+                                <input type="text" id="card-expiry" autocomplete="off">
                             </div>
                             <div class="form-group half">
                                 <label>CVV</label>
-                                <input type="text" id="card-cvv">
+                                <input type="password" id="card-cvv" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -176,9 +170,26 @@
             </div>
         </div>
 
+        <!-- Reset Modal -->
+        <div id="reset-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Delete vault</h2>
+                <p class="warning-text">This permanently erases local vault data. Type DELETE to confirm.</p>
+                <div class="form-group">
+                    <label for="reset-confirm-input">Confirmation</label>
+                    <input type="text" id="reset-confirm-input" placeholder="DELETE" autocomplete="off"
+                        spellcheck="false">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-reset-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="button" id="confirm-reset-btn" class="btn btn-danger" disabled>Delete everything</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Scripts -->
+    <script src="js/boot.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
 

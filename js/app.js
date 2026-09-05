@@ -28,14 +28,16 @@ let hiddenTimer = null;
 // Initialization
 async function init() {
     const meta = Storage.getMeta();
+    const footerHint = UI.authView.querySelector('.auth-footer .small-text');
     if (!meta) {
         STATE.isNewUser = true;
         UI.authView.querySelector('h1').textContent = 'Create Vault';
         UI.authView.querySelector('p').textContent = 'Set a master password to secure your data.';
 
-        const warningEl = UI.authView.querySelector('.small-text') || UI.authView.querySelector('.funny-warning');
-        warningEl.className = 'funny-warning';
-        warningEl.textContent = 'Tattoo this on your brain! If you lose it, your data becomes digital confetti. Unrecoverable, sad confetti. 🎊➡️🗑️😭';
+        if (footerHint) {
+            footerHint.className = 'funny-warning';
+            footerHint.textContent = 'Tattoo this on your brain! If you lose it, your data becomes digital confetti. Unrecoverable, sad confetti. 🎊➡️🗑️😭';
+        }
 
         UI.unlockBtn.textContent = 'Create Vault';
         UI.masterPasswordInput.setAttribute('autocomplete', 'new-password');
@@ -45,7 +47,10 @@ async function init() {
         STATE.isNewUser = false;
         UI.authView.querySelector('h1').textContent = 'Unlock Vault';
         UI.authView.querySelector('p').textContent = 'Enter your master password to access your secure data.';
-        UI.authView.querySelector('.small-text').textContent = '';
+        if (footerHint) {
+            footerHint.className = 'small-text';
+            footerHint.textContent = 'Forgot it? The master password cannot be recovered.';
+        }
         UI.unlockBtn.textContent = 'Unlock';
         UI.masterPasswordInput.setAttribute('autocomplete', 'current-password');
 
